@@ -21,43 +21,43 @@ load("txt.RData")
 
 ## Task Description
 
-This work describe language model development that must predict expected next word for user that will be typing some sentence.  
+This paper describes the development of a language model that should predict the expected next word for the user who will type some sentence.  
 
-To train model [text corpus](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip) composed form more than 4,2 mln sentences from blogs, news and tweets was used.
+To train the model [text corpus](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip) of more than 4,2 mln sentences from blogs, news and tweets were used.
 
-As prepare step for model development exploratory analysis was performed. It's described [here](http://rpubs.com/jbone/499816) in details.
+A research analysis was performed as a preparatory step to the development of the model. It's described [here](http://rpubs.com/jbone/499816) in details.
 
 
 
 ## Predictive model
 
-We use a [n-gram](https://en.wikipedia.org/wiki/N-gram) approach to produce language model.
-Final model use trigrams and bigrams for next word prediction. 
+The [n-gram](https://en.wikipedia.org/wiki/N-gram) approach was used to create language model.
+The final model uses trigrams and bigrams to predict the next word. 
 
-To raise the accuracy of the model an interpolation method known as [Kneser-Nei Smoothing](https://www.google.com/search?rlz=1C1SQJL_ruRU829RU829&ei=mRwTXdbnBvGorgSPn6f4CQ&q=Kneser+Ney+smoothing+wikipedia) was used. This method helps smooth probability of n-grams direct counts by using information about how likely next word appears as a novel continuation.   
+To improve the accuracy of the model an interpolation method known as [Kneser-Nei Smoothing](https://www.google.com/search?rlz=1C1SQJL_ruRU829RU829&ei=mRwTXdbnBvGorgSPn6f4CQ&q=Kneser+Ney+smoothing+wikipedia) was used. This method helps smooth the probability of n-grams from direct counts using information about how likely next word appears as a novel continuation.   
 
-To minimize memory usage to store n-gram dictionaries  
+To minimize memory usage for storing n-gram dictionaries  
 
-- we use only 3 most likely outcomes for trigrams and bigrams,
-- we code words with integers in that dictionaries.
+- only the 3 most likely outcomes for trigrams and bigrams are used,
+- words are encoded with integers in the dictionaries.
 
 You can find R code of model development and performance assessment on [github](https://github.com/jbonesb/capstone).
 
 
 ## Model performance
 
-To assess model accuracy "out of sample" approach was used. We split initial sentence array on train and test datasets. Then we use train dataset to train the model and test dataset to accuracy assement.
+To assess model accuracy "out of sample" approach was used. Initial sentence array was splitted on train and test datasets. Then the train dataset was used to train the model and test dataset was used for accuracy assement.
 
-Accuracy of final model presented in table below 
+Accuracy of final model is presented in the table below
 ```{r stat}
 report[,1:3]
 ```
 
-And this model need around **330 Mb** of memory to store n-gram dictionaries.
+The model needs around **330 Mb** of memory to store n-gram dictionaries.
 
 
 ## One picture is worth a thousand words
-
+You need just start typing text and put whitespace or click word on the button and you will see three best next word prediction on the buttons.
 ```{r, echo=FALSE}
 shinyApp(
 
