@@ -1,7 +1,7 @@
 
 setwd("C:/Work/DS/Capstone")
 #setwd("c:/Users/SB/Documents/Data Sceince/10. Capstone")
-library(data.table); library(ggplot2); library(tidyr); library(tidytext); library(dplyr) 
+library(data.table); library(data.table); library(ggplot2); library(tidyr); library(tidytext); library(dplyr); 
 
 # functions 
 # remove all simbols that not english letters, whitespace or apostrophe
@@ -76,7 +76,7 @@ clearText$text <- text$text %>% tolower() %>% rmSpec() %>% stripWhitespace() %>%
 tmp <- clearText
 set.seed(123)
 
-train_ind <- sample(seq_len(nrow(tmp)), size = floor(0.60 * nrow(tmp)))
+train_ind <- sample(seq_len(nrow(tmp)), size = floor(0.15 * nrow(tmp)))
 train <- tmp[train_ind, ]
 train <- train[sample(seq_len(nrow(train)), size = floor(1*nrow(train))), ]
 
@@ -160,7 +160,7 @@ TD <- train[, "text"] %>%
     # and use it to spread discounted probability mass in proportion to lower order probabiliry that based on continuation count
     mutate( p_kn3 = pmax(n-d3, 0) / sum(n) + lamb3 * p_kn2 ) %>%
     # select data that we need in prediction
-    select(-cont_n3, -lamb3, -dl3, -p3) %>%
+    select(-cont_n3, -lamb3, -dl3) %>%
     ungroup()
 
 
@@ -193,6 +193,9 @@ TDc <- TD %>%
     select(-word1, -word2, -word3, -n, -p_kn2)
 
 # save dicts for forward use in application
+UD <- as.data.table(UD)
+BDc <- as.data.table(BDc)
+TDc <- as.data.table(TDc)
 save(file = "txt.Rdata", list = c("UD", "BDc", "TDc"))   
 
 
@@ -262,25 +265,12 @@ textPredAccNgram <- function(txt){
                               accuracy =  sum(accuracy * nna) / sum(nna), 
                               confusion = sum(confusion * nn) / sum(nn)) %>% 
                     mutate(type= "total")
-        ) %>% select(type, accuracy, confusion, n)
-        
-    # print(paste0("bigrams accuracy: ", round( 100*sum(bigrams$pred, na.rm = T) / sum(!is.na(bigrams$pred)), 1 ),"%"))
-    # print(paste0("bigrams NA rate: ", round( 100*sum(is.na(bigrams$pred)) / length(bigrams$pred), 1 ),"%"))
-    # print(paste0("bigrams length: ", length(bigrams$pred)))
-    # 
-    # print(paste0("trigrams accuracy: ", round( 100*sum(trigrams$pred, na.rm = T) / sum(!is.na(trigrams$pred)), 1 ),"%"))
-    # print(paste0("trigrams NA rate: ", round( 100*sum(is.na(trigrams$pred)) / length(trigrams$pred), 1 ),"%"))
-    # print(paste0("trigrams length: ", length(trigrams$pred)))
-    # print(paste0("total accuracy: ", 
-    #              round( ( 100*sum(bigrams$pred, na.rm = T) + 100*sum(trigrams$pred, na.rm = T) ) /
-    #                         ( nrow( txt %>% unnest_tokens(word, text)) - nrow(txt) ) , 1),
-    #              "%")
-    # )
-    # print(paste0("total words to predict: ", nrow( txt %>% unnest_tokens(word, text)) - nrow(txt) ))
-} 
+        ) %>% select(type, accuracy, confusion, n) %>% 
+            rename(`Accuracy, %` = accuracy, `Confusion, %` = confusion)
+ } 
 
 # run test to get accuracy report
-report <- textPredAccNgram (test)
+report <- textPredAccNgram (test[1:10000, ])
 # and save it for forward use in application
 save(file = "stat.Rdata", list = c("report"))   
 
